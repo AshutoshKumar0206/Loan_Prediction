@@ -96,17 +96,21 @@ x_test_vis = x_test[features]
 
 # model = LogisticRegression(class_weight='balanced', max_iter=500)#logistic regression model
 # model = GaussianNB()#naive bayes model
-model = SVC(kernel='rbf', class_weight='balanced', C=1.0)
+model = SVC(kernel='poly', class_weight='balanced', C=1.0)
 #till now svc is better than naive bayes and logistic regression model
 model.fit(x_vis, y_train)
 
 # plot_decision_boundary(x_vis, y_train, model)
-plot_3d_plot(x_vis,y_train)
+# plot_3d_plot(x_vis,y_train)
 y_pred = model.predict(x_test_vis)
 # print(y_pred)
 
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score
 
+X_old = np.array(x, dtype=float)
+X_new=np.exp(-(X_old**2))
+plt.scatter(X_new[:, 0], X_new[:, 1], c=y, s=50, cmap='bwr')
+plt.show()
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print(confusion_matrix(y_test, y_pred))
 print(classification_report(y_test, y_pred))
