@@ -39,6 +39,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from matplotlib.colors import ListedColormap
 #Model used of logistic Regression
 
 # df[num_cols] = scale.fit_transform(df[num_cols])
@@ -52,14 +53,43 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 x_train[num_cols] = scale.fit_transform(x_train[num_cols])
 x_test[num_cols] = scale.transform(x_test[num_cols])
 
+zero_one_colourmap = ListedColormap(('blue', 'red'))
+def plot_decision_boundary(X, y, clf):
+    X_set, y_set = X.values, y.values
+    X1, X2 = np.meshgrid(np.arange(start = X_set[:, 0].min() - 1, 
+                                 stop = X_set[:, 0].max() + 1, 
+                                 step = 0.01),
+                       np.arange(start = X_set[:, 1].min() - 1, 
+                                 stop = X_set[:, 1].max() + 1, 
+                                 step = 0.01))
+  
+    plt.contourf(X1, X2, clf.predict(np.array([X1.ravel(), 
+                                             X2.ravel()]).T).reshape(X1.shape),
+               alpha = 0.75, 
+               cmap = zero_one_colourmap)
+    plt.xlim(X1.min(), X1.max())
+    plt.ylim(X2.min(), X2.max())
+    for i, j in enumerate(np.unique(y_set)):
+        plt.scatter(X_set[y_set == j, 0], X_set[y_set == j, 1],
+                c = (zero_one_colourmap)(i), label = j)
+    plt.title('SVM Decision Boundary')
+    plt.xlabel('X1')
+    plt.ylabel('X2')
+    plt.legend()
+    return plt.show()
+
+features = ["Credit_History", "LoanAmount"]
+x_vis = x_train[features]
+x_test_vis = x_test[features]
 
 # model = LogisticRegression(class_weight='balanced', max_iter=500)#logistic regression model
 # model = GaussianNB()#naive bayes model
 model = SVC(kernel='linear', class_weight='balanced', C=1.0)
 #till now svc is better than naive bayes and logistic regression model
-model.fit(x_train, y_train)
+model.fit(x_vis, y_train)
 
-y_pred = model.predict(x_test)
+plot_decision_boundary(x_vis, y_train, model)
+y_pred = model.predict(x_test_vis)
 # print(y_pred)
 
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score
