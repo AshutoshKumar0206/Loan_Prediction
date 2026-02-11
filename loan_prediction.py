@@ -78,17 +78,30 @@ def plot_decision_boundary(X, y, clf):
     plt.legend()
     return plt.show()
 
+def plot_3d_plot(X, y):
+    X = np.array(X)
+    r = np.exp(-(X ** 2).sum(axis=1))
+    # fig = plt.figure(figsize=(8, 6))
+    ax = plt.subplot(projection='3d')
+    ax.scatter3D(X[:, 0], X[:, 1], r, c=y, s=100, cmap='bwr')
+    ax.set_xlabel('X1')
+    ax.set_ylabel('X2')
+    ax.set_zlabel('y')
+    plt.show()
+    return ax
+
 features = ["Credit_History", "LoanAmount"]
 x_vis = x_train[features]
 x_test_vis = x_test[features]
 
 # model = LogisticRegression(class_weight='balanced', max_iter=500)#logistic regression model
 # model = GaussianNB()#naive bayes model
-model = SVC(kernel='linear', class_weight='balanced', C=1.0)
+model = SVC(kernel='rbf', class_weight='balanced', C=1.0)
 #till now svc is better than naive bayes and logistic regression model
 model.fit(x_vis, y_train)
 
-plot_decision_boundary(x_vis, y_train, model)
+# plot_decision_boundary(x_vis, y_train, model)
+plot_3d_plot(x_vis,y_train)
 y_pred = model.predict(x_test_vis)
 # print(y_pred)
 
