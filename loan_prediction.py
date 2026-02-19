@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv("../train_u6lujuX_CVtuZ9i.csv")
 df.dropna(inplace=True)
-
 df = df.drop("Loan_ID", axis=1)
 df["LoanAmount"].fillna(df["LoanAmount"].median(), inplace=True)
 df["Loan_Amount_Term"].fillna(df["Loan_Amount_Term"].median(), inplace=True)
@@ -21,9 +20,19 @@ df["Education"] = df['Education'].map({"Graduate":1, "Not Graduate":0})
 df["Married"] = df['Married'].map({"Yes":1, "No":0})
 df["Self_Employed"] = df['Self_Employed'].map({"Yes":1, "No":0})
 df["Loan_Status"] = df['Loan_Status'].map({"Y":1, "N":0})
+df['ApplicantIncome'] = np.log1p(df['ApplicantIncome'])
+df['CoapplicantIncome'] = np.log1p(df['CoapplicantIncome'])
+df['LoanAmount'] = np.log1p(df['LoanAmount'])
 
 # ---- ONE HOT for Property Area ----
 df = pd.get_dummies(df, columns=["Property_Area"], drop_first=True)
+# print(df.shape)
+# print(df.info())
+# print(df['Loan_Status'].value_counts(normalize=True) * 100)
+# print(df.describe())
+# print(df.nunique())
+print(df.skew())
+
 # for col in cat_cols:
 #     print(df[col].value_counts())
 # df = df.drop(["Dependents", "Married", "ApplicantIncome"], axis=1)
@@ -98,13 +107,15 @@ x_test_vis = x_test[features]
 # model = LogisticRegression(class_weight='balanced', max_iter=500)#logistic regression model
 # model = GaussianNB()#naive bayes model
 # model = SVC(kernel='poly', class_weight='balanced', C=1.0)#support vector classifier
-model = DecisionTreeClassifier()
+model = DecisionTreeClassifier(class_weight='balanced', max_depth=4,
+    min_samples_split=10,
+    random_state=42)
 #till now svc is better than naive bayes and logistic regression model
-model.fit(x_vis, y_train)
+model.fit(x_train, y_train)
 
 # plot_decision_boundary(x_vis, y_train, model)
 # plot_3d_plot(x_vis,y_train)
-y_pred = model.predict(x_test_vis)
+y_pred = model.predict(x_test)
 # print(y_pred)
 
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, f1_score
@@ -122,6 +133,6 @@ from sklearn.tree import plot_tree
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 
-rcParams['figure.figsize'] = 80,10
-plot_tree(model)
-plt.show()
+# rcParams['figure.figsize'] = 8,5
+# plot_tree(model)
+# plt.show()
